@@ -477,8 +477,10 @@
 
         document.getElementById("search-box").addEventListener("blur", () => {
             document.getElementById("search-results").style.maxHeight = 0;
-            document.getElementById("search-box").style.borderBottomLeftRadius = "10px";
-            document.getElementById("search-box").style.borderBottomRightRadius = "10px";
+            setTimeout(() => {
+                document.getElementById("search-box").style.borderBottomLeftRadius = "10px";
+                document.getElementById("search-box").style.borderBottomRightRadius = "10px";
+            }, 350)
         });
 
         document.getElementById("search-box").addEventListener("input", () => {
