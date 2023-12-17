@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        @import url(https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css);
+
+        body {
+            background-color: cyan;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1%;
+            width: 100%;
+            left: 0;
+            top: 0;
+            position: fixed;
+        }
+
+        .search-bar {
+            border-radius: 10px;
+            font-size: 1.5em;
+            width: 200%;
+            margin-left: -75%;
+            border: 2px solid white;
+            outline: none;
+        }
+
+
+        #left,
+        #right {
+            position: fixed;
+            height: 100%;
+            margin-top: 4.65%;
+        }
+
+        #left {
+            left: 0;
+            width: 20%;
+            margin-top: 7.5%;
+            font-size: 1.5em;
+        }
+
+        #right {
+            background-color: yellow;
+            fill: yellow;
+            right: 30px;
+            top: 8px;
+            width: 80%;
+            height: 85%;
+            padding-left: 3%;
+            border-radius: 30px;
+            z-index: -1;
+        }
+
+        .path {
+            font-size: 1.5em;
+        }
+
+        td,
+        th {
+            text-align: center;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .folder-files {
+            overflow-y: scroll;
+            position: fixed;
+            width: 75%;
+            height: 70%;
+            border-radius: 25px;
+            z-index: -100;
+        }
+
+        .links {
+            word-spacing: 50px;
+        }
+
+        #left {
+            text-align: center;
+        }
+
+        #upload,
+        #create,
+        #access,
+        #settings {
+            position: absolute;
+            text-align: center;
+            justify-content: center;
+            display: flex;
+            padding-top: 10%;
+            padding-left: 40%;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: none;
+        }
+
+        #access h3 {
+            padding-top: 10%;
+            padding-left: 0%;
+            width: 100%;
+        }
+
+        #upload form,
+        #create form,
+        #access form,
+        #settings form {
+            text-align: center;
+            width: 30%;
+            background-color: red;
+            padding: 10px;
+            border-radius: 22px;
+        }
+
+        .close button {
+            background: none;
+            color: white;
+            border: none;
+            font-size: 3em;
+        }
+
+        #search-results {
+            position: fixed;
+            background-color: white;
+            color: white;
+            left: 23.1%;
+            top: 7.5%;
+            width: 37.7%;
+            text-align: left;
+            font-size: 1.25em;
+            max-height: 0;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            transition: all 400ms ease-in-out;
+            z-index: 1;
+        }
+
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1%;
+        }
+
+        .item-name {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="">
+        <div class="search">
+            <input type="search" placeholder="Search" class="search-bar" id="search-box">
+        </div>
+        <div id="search-results">
+
+        </div>
+        <div class="links">
+            <a href="/">Home</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </nav>
+
+    {% if owner != False %}
+
+    <div id="body">
+        <div id="left">
+            <a href="/">Home</a>
+            <br><br>
+            <a href="javascript:create()">Create</a>
+            <br><br>
+            <a href="javascript:upload()">Upload File</a>
+            <br><br>
+            {% if type == False %}
+            <a href="javascript:openaccess()">Grant Access</a>
+            <br><br>
+            {% endif %}
+            <a href="javascript:settings()">Settings</a>
+        </div>
+        <div id="right">
+            <br>
+            <div class="path">
+                <a href="/">Home</a> >
+                {% for i in links %}
+                {{ i|safe }} >
+                {% endfor %}
+                <a href="/folder/{{ special }}">{{ name }}</a>
+            </div>
+            <br>
+
+            <div class="folder-files">
+
+                {% if not folders and not files %}
+                <center>
+                    <h1>Folder is empty.</h1>
+                </center>
+                {% else %}
+
+                <table width="100%" class="table table-dark table-hover">
+                    <tr>
+                        <th>Name</th>
+                        <th>Date of Upload</th>
+                        <th>Time of Upload</th>
+                        <th>Download</th>
+                        <th>Delete</th>
+                    </tr>
+                    {% for i in folders %}
+                    <tr>
+                        <td>
+                            <svg height="24px" width="24px" focusable="false" viewBox="0 0 24 24" fill="#5f6368"
+                                class="a-s-fa-Ha-pa">
+                                <g>
+                                    <path
+                                        d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8h-8v-1c0-1.33 2.67-2 4-2s4 .67 4 2v1z">
+                                    </path>
+                                    <path d="M0 0h24v24H0z" fill="none"></path>
+                                </g>
+                            </svg>
+                            <a href="/folder/{{ i.specialname }}">{{ i.name }}</a>
+                        </td>
+                        <td>{{ i.fdate }}</td>
+                        <td>{{ i.ftime }}</td>
+                        <td></td>
+                        <td>
+                            <form action="{% url 'deletefolder' %}" method="post">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="special" value="{{ i.specialname }}">
+
+                                <input type="hidden" name="from" value="{{ special }}">
+
+                                <input type="hidden" name="location" value="folder">
+
+                                <input type="submit" value="Delete">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    {% for i in files %}
+                    <tr>
+                        <td>
+                            <a href="/assets/{{ i }}" target="_blank">{{ i }}</a>
+                        </td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.time }}</td>
+                        <td>
+                            <a href="/assets/{{ i }}" download>{{ i }}</a>
+                        </td>
+                        <td>
+                            <form action="{% url 'deletefile' %}" method="post">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="from" value="{{ special }}">
+
+                                <input type="hidden" name="id" value="{{ i.id }}">
+
+                                <input type="hidden" name="location" value="folder">
+
+                                <input type="submit" value="Delete">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="upload">
+
+            <div class="close">
+                <button onclick="closeUpload()">&times;</button>
+            </div>
+
+            <form action="{% url 'uploadFile' %}" method="post" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="special" value="{{ special }}">
+
+                <h1>Upload File: </h1>
+                <br>
+                <input type="file" name="file" class="form form-control">
+
+                <br><br>
+
+                <input type="submit" value="Submit" class="btn btn-primary">
+
+            </form>
+        </div>
+
+        <div id="create">
+
+            <div class="close">
+                <button onclick="closeCreate()">&times;</button>
+            </div>
+
+            <form action="{% url 'createFolder' %}" method="post">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="parentdir" value="{{ url }}">
+
+                <label>Name: </label>
+                <input type="text" name="name" placeholder="Enter folder name: " class="form-control">
+
+                <br>
+
+                <input type="radio" name="type" value="1">Public
+                <input type="radio" name="type" value="0">Private
+
+                <br><br>
+
+                <input type="submit" value="Create Folder" class="btn btn-primary">
+            </form>
+        </div>
+
+        {% if type == False %}
+
+        <div id="access">
+
+            <div class="close">
+                <button onclick="closeAccess()">&times;</button>
+            </div>
+
+            {% if users %}
+
+            <form action="{% url 'grantAccess' %}" method="post">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="special" value="{{ special }}">
+
+                <label>Give access to: </label>
+                <select multiple>
+                    {% for user in users %}
+                    <option onclick="access(`{{ user.email }}`)">{{ user.email }}</option>
+                    {% endfor %}
+                </select>
+
+                <div id="access-users">
+
+                </div>
+
+                <br><br>
+
+                <input type="submit" value="Submit" id="access-btn" class="btn btn-primary" disabled>
+
+            </form>
+
+
+            {% elif type == False %}
+
+            <h3>You have given access to all other users.</h3>
+
+            {% endif %}
+        </div>
+
+        {% endif %}
+
+        <div id="settings">
+
+            <div class="close">
+                <button onclick="closeSettings()">&times;</button>
+            </div>
+
+            <form action="{% url 'changetype' %}" method="post">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="special" value="{{ special }}">
+
+                <h3>Change access settings:</h3>
+
+                {% if type == False %}
+                <input type="radio" name="access" value="1">Public
+                <input type="radio" name="access" value="0" checked>Private
+
+                {% else %}
+                <input type="radio" name="access" value="1" checked>Public
+                <input type="radio" name="access" value="0">Private
+
+                {% endif %}
+
+                <br><br>
+
+                <input type="submit" value="Submit" class="btn btn-primary">
+
+            </form>
+        </div>
+
+
+
+    </div>
+
+    <script>
+
+        let accessgranted = [];
+
+        function access(email) {
+            if (accessgranted.includes(email) == false) {
+                accessgranted.push(email);
+                console.log(accessgranted);
+            }
+
+            if (accessgranted.length > 0) {
+                document.getElementById("access-btn").removeAttribute("disabled");
+                document.getElementById("access-users").innerHTML = `<input type="hidden" name="access" value=${accessgranted}>`;
+            } else {
+                document.getElementById("access-btn").setAttribute("disabled");
+            }
+
+        }
+
+        function upload() {
+            document.getElementById('upload').style.display = "block";
+            closeCreate();
+            closeAccess();
+        }
+
+        function create() {
+            document.getElementById('create').style.display = "block";
+            closeUpload();
+            closeAccess();
+        }
+
+        function closeUpload() {
+            document.getElementById('upload').style.display = "none";
+        }
+
+        function closeCreate() {
+            document.getElementById('create').style.display = "none";
+        }
+
+        function openaccess() {
+            document.getElementById('access').style.display = "block";
+            closeUpload();
+            closeCreate();
+        }
+
+        function closeAccess() {
+            document.getElementById('access').style.display = "none";
+        }
+
+        function settings() {
+            document.getElementById("settings").style.display = "block";
+        }
+
+        function closeSettings() {
+            document.getElementById("settings").style.display = "none";
+        }
+
+        document.getElementById("search-box").addEventListener("focus", () => {
+            document.getElementById("search-results").style.maxHeight = "150px";
+            document.getElementById("search-box").style.borderBottomLeftRadius = 0;
+            document.getElementById("search-box").style.borderBottomRightRadius = 0;
+        });
+
+
+        document.getElementById("search-box").addEventListener("blur", () => {
+            document.getElementById("search-results").style.maxHeight = 0;
+            document.getElementById("search-box").style.borderBottomLeftRadius = "10px";
+            document.getElementById("search-box").style.borderBottomRightRadius = "10px";
+        });
+
+        document.getElementById("search-box").addEventListener("input", () => {
+            let query = document.getElementById("search-box").value;
+            if (query == "") {
+                document.getElementById("search-results").innerHTML = "";
+            } else {
+                $.ajax({
+                    url: "{% url 'search' %}",
+                    type: "GET",
+                    contentType: "text/javascript",
+                    dataType: "text",
+                    data: {
+                        'query': query
+                    },
+                    success: (res) => {
+                        res = res.split(",");
+                        document.getElementById("search-results").innerHTML = "";
+                        for (let i = 0; i < res.length; i++) {
+                            document.getElementById("search-results").innerHTML += res[i];
+                        }
+                    },
+                    error: (err) => {
+                        console.log(err)
+                    }
+                })
+            }
+        })
+
+    </script>
+
+    {% else %}
+
+    <div id="body">
+        <div id="left">
+            <a href="/">Home</a>
+        </div>
+        <div id="right">
+            <br>
+            <div class="path">
+                <a href="/">Home</a> >
+                {% for i in links %}
+                {{ i|safe }} >
+                {% endfor %}
+                <a href="/folder/{{ special }}">{{ name }}</a>
+            </div>
+            <br>
+
+            <div class="folder-files">
+
+                {% if not folders and not files %}
+                <center>
+                    <h1>Folder is empty.</h1>
+                </center>
+                {% else %}
+
+                <table width="100%" class="table table-dark table-hover">
+                    <tr>
+                        <th>Name</th>
+                        <th>Date of Upload</th>
+                        <th>Time of Upload</th>
+                        <th>Download</th>
+                    </tr>
+                    {% for i in folders %}
+                    <tr>
+                        <td>
+                            <svg height="24px" width="24px" focusable="false" viewBox="0 0 24 24" fill="#5f6368"
+                                class="a-s-fa-Ha-pa">
+                                <g>
+                                    <path
+                                        d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8h-8v-1c0-1.33 2.67-2 4-2s4 .67 4 2v1z">
+                                    </path>
+                                    <path d="M0 0h24v24H0z" fill="none"></path>
+                                </g>
+                            </svg>
+                            <a href="/folder/{{ i.specialname }}">{{ i.name }}</a>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+
+                    {% for i in files %}
+                    <tr>
+                        <td>
+                            <a href="/assets/{{ i }}" target="_blank">{{ i }}</a>
+                        </td>
+                        <td>{{ i.date }}</td>
+                        <td>{{ i.time }}</td>
+                        <td>
+                            <a href="/assets/{{ i }}" download>{{ i }}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+            </div>
+
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</body>
+
+</html>

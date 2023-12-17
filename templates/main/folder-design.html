@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="folder.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <nav>
+        <img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="">
+        <div class="search">
+            <input type="search" placeholder="Search" class="search-bar" id="search-box">
+        </div>
+        <div id="search-results">
+            <a href="">
+                <div class="item">
+                    <div id="main">
+                        <div class="item-name">
+                            <svg height="35px" width="30px" focusable="false" viewBox="0 0 24 24" fill="#5f6368"
+                            class="a-s-fa-Ha-pa">
+                            <g>
+                                <path
+                                    d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8h-8v-1c0-1.33 2.67-2 4-2s4 .67 4 2v1z">
+                                </path>
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                            </g>
+                        </svg>
+                            <h3>Item 1</h3>
+                        </div>
+                        <div class="owner">
+                            <p>Owner: John Doe</p>
+                        </div>
+                    </div>
+                    <div id="date">
+                        Nov. 24, 2023
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="links">
+            <a href="">Home</a>
+            <a href="">Logout</a>
+        </div>
+    </nav>
+
+    <div id="body">
+        <div id="left">
+            <a href="">Home</a>
+            <br><br>
+            <a href="javascript:create()">Create</a>
+            <br><br>
+            <a href="javascript:upload()">Upload File</a>
+            <br><br>
+            <a href="">Settings</a>
+        </div>
+        <div id="right">
+            <br>
+            <div class="path">
+                <a href="">Home</a> > <a href="">Sai Teja</a> > <a href="">Chitraksh</a>
+            </div>
+            <br>
+
+            <div class="folder-files">
+
+                <table width="100%" class="table table-dark table-hover">
+                    <tr>
+                        <th>Name</th>
+                        <th>Date of Upload</th>
+                        <th>Time of Upload</th>
+                        <th>Download</th>
+                        <th>Delete</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <svg height="24px" width="24px" focusable="false" viewBox="0 0 24 24" fill="#5f6368"
+                                class="a-s-fa-Ha-pa">
+                                <g>
+                                    <path
+                                        d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm4 8h-8v-1c0-1.33 2.67-2 4-2s4 .67 4 2v1z">
+                                    </path>
+                                    <path d="M0 0h24v24H0z" fill="none"></path>
+                                </g>
+                            </svg>
+                            <a href="">Sai Teja</a>
+                        </td>
+                        <td>2021-09-15</td>
+                        <td>10:30</td>
+                        <td><a href="">Download</a></td>
+                        <td>
+                            <form action="" method="post">
+                                <input type="submit" value="Delete">
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <div id="upload">
+
+            <div class="close">
+                <button onclick="closeUpload()">&times;</button>
+            </div>
+
+            <form action="" method="post">
+                <input type="hidden" name="special" value="{{ special }}">
+
+                <h1>Upload File: </h1>
+                <br>
+                <input type="file" name="file" class="form form-control">
+
+                <br><br>
+
+                <input type="submit" value="Submit" class="btn btn-primary">
+
+            </form>
+        </div>
+
+        <div id="create">
+
+            <div class="close">
+                <button onclick="closeCreate()">&times;</button>
+            </div>
+
+            <form action="" method="post">
+                <input type="hidden" name="parentdir" value="{{ url }}">
+
+                <label>Name: </label>
+                <input type="text" name="name" placeholder="Enter folder name: " class="form-control">
+
+                <br>
+
+                <input type="radio" name="type" value="1">Public
+                <input type="radio" name="type" value="0">Private
+
+                <br><br>
+
+                <input type="submit" value="Create Folder" class="btn btn-primary">
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        function upload() {
+            document.getElementById('upload').style.display = "block";
+        }
+
+        function create() {
+            document.getElementById('create').style.display = "block";
+        }
+
+        function closeUpload(){
+            document.getElementById('upload').style.display = "none";
+        }
+
+        function closeCreate(){
+            document.getElementById('create').style.display = "none";
+        }
+
+        document.getElementById("search-box").addEventListener("focus", () => {
+            document.getElementById("search-results").style.maxHeight = "150px";
+            document.getElementById("search-box").style.borderBottomLeftRadius = 0;
+            document.getElementById("search-box").style.borderBottomRightRadius = 0;
+        });
+
+
+        document.getElementById("search-box").addEventListener("blur", () => {
+            document.getElementById("search-results").style.maxHeight = 0;
+            document.getElementById("search-box").style.borderBottomLeftRadius = "10px";
+            document.getElementById("search-box").style.borderBottomRightRadius = "10px";
+        })
+
+        document.getElementById("search-box").addEventListener("input", () => {
+            let query = document.getElementById("search-box").value;
+            $.ajax({
+                url: "{% url 'search' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                dataType: "text",
+                data: {
+                    'query': query
+                },
+                success: (res) => {
+                    console.log(res);
+                },
+                error: (err) => {
+                    console.log(err)
+                }
+            })
+        })
+
+    </script>
+
+</body>
+
+</html>

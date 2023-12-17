@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    {% if owner != False %}
+
+    {% if not folders and not files %}
+    <center>
+        <h1>You have no folders or files.</h1>
+    </center>
+    {% else %}
+
+    {% for i in folders %}
+    <a href="/folder/{{ i.specialname }}">{{ i.name }}</a>
+    <br><br>
+    {% endfor %}
+
+    {% for i in files %}
+    <a href="/assets/files/{{ i }}" target="_blank">{{ i }}</a>
+    <br><br>
+    {% endfor %}
+
+    {% endif %}
+
+    <div id="links">
+        <a href="/">Home</a>
+        <br><br>
+        {% for i in links %}
+            {{ i|safe }}
+            <br><br>
+        {% endfor %}
+    </div>
+
+    {{ url }}
+    <br><br>
+    {{ special }}
+    <br><br>
+
+    <form action="{% url 'createFolder' %}" method="post">
+        {% csrf_token %}
+
+        <input type="hidden" name="parentdir" value="{{ url }}">
+
+        <label>Name: </label>
+        <input type="text" name="name" placeholder="Enter folder name: ">
+
+        <br><br>
+
+        <input type="radio" name="type" value="1">Public
+        <input type="radio" name="type" value="0">Private
+
+        <br><br>
+
+        <input type="submit" value="Create Folder">
+
+    </form>
+
+    <br><br>
+
+    <form action="{% url 'uploadFile' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <input type="hidden" name="special" value="{{ special }}">
+
+        <label>Upload File: </label>
+        <input type="file" name="file">
+
+        <br><br>
+
+        <input type="submit" value="Submit">
+
+    </form>
+
+    {% if users %}
+
+    <form action="{% url 'grantAccess' %}" method="post">
+
+        {% csrf_token %}
+
+        <input type="hidden" name="special" value="{{ special }}">
+
+        <label>Give access to: </label>
+        <select multiple>
+            {% for user in users %}
+            <option onclick="access(`{{ user.email }}`)">{{ user.email }}</option>
+            {% endfor %}
+        </select>
+
+        <div id="access">
+
+        </div>
+
+        <br><br>
+
+        <input type="submit" value="Submit" id="access-btn" disabled>
+
+    </form>
+
+    {% elif type == False %}
+
+    <h3>You have given access to all other users.</h3>
+
+    {% endif %}
+
+    <script>
+
+        let accessgranted = [];
+
+        function access(email) {
+            if (accessgranted.includes(email) === false){
+                accessgranted.push(email);
+            }
+
+            if (accessgranted.length > 0){
+                document.getElementById("access-btn").removeAttribute("disabled");
+                document.getElementById("access").innerHTML = `<input type="hidden" name="access" value=${accessgranted}>`;
+            } else {
+                document.getElementById("access-btn").setAttribute("disabled");
+            }
+
+        }
+
+    </script>
+
+    {% else %}
+
+    {% if not folders and not files %}
+    <center>
+        <h1>Folder is empty.</h1>
+    </center>
+    {% else %}
+
+    {% for i in folders %}
+    <a href="/folder/{{ i.specialname }}">{{ i.name }}</a>
+    <br><br>
+    {% endfor %}
+
+    {% for i in files %}
+    <a href="/assets/files/{{ i }}" target="_blank">{{ i }}</a>
+    <br><br>
+    {% endfor %}
+
+    {% endif %}
+
+    {% endif %}
+
+</body>
+
+</html>
