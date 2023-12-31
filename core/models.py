@@ -1,6 +1,9 @@
 from django.db import models
 import datetime
 
+def filePath(instance, filename):
+    return f"{instance.uploaded_by.email}{instance.folder}/{filename}"
+
 # Create your models here.
 
 class Users(models.Model):
@@ -14,7 +17,8 @@ class Users(models.Model):
 class Files(models.Model):
     id = models.IntegerField(primary_key=True, blank=False, null=False, unique=True)
     uploaded_by = models.ForeignKey(Users, on_delete=models.CASCADE)
-    file = models.FileField(upload_to="")
+    file = models.FileField(upload_to=filePath)
+    folder = models.CharField("Folder", max_length=35)
     date = models.DateField(name="date", verbose_name="Date")
     time = models.TimeField(name="time", verbose_name="Time")
 
@@ -30,5 +34,5 @@ class Folders(models.Model):
     files = models.ManyToManyField(Files, related_name="files", blank=True)
     public = models.BooleanField("Public")
     access = models.ManyToManyField(Users, related_name="access", blank=True)
-    date = models.DateField(name="fdate", verbose_name="Date", null=True)
+    date = models.DateField(name="fdate", verbose_name="Date")
     time = models.TimeField(name="ftime", verbose_name="Time", default=datetime.datetime.now().strftime("%H:%M:%S"), null=True)
