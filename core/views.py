@@ -158,9 +158,9 @@ def folder(request, special):
                 if i.email != request.session.get("email") and i not in res.access.all():
                     users.append(i)
 
-        return render(request, "main/folder.html", {"url":url, "folders":folders, "files":files, "special":special, "users":users, "type":Type, "links":links, "name":res.name})
+        return render(request, "main/folder.html", {"url":url, "folders":folders, "files":files, "special":special, "users":users, "type":Type, "links":links, "name":res.name, "root":request.session.get("email")})
 
-    return render(request, "main/folder.html", {"url":url, "folders":folders, "files":files, "special":special, "owner":False, "links":links, "name":res.name})
+    return render(request, "main/folder.html", {"url":url, "folders":folders, "files":files, "special":special, "owner":False, "links":links, "name":res.name, "root":request.session.get("email")})
 
 def uploadFile(request):
     if request.method == 'POST':
