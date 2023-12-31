@@ -142,6 +142,10 @@ def folder(request, special):
 
     files = results
 
+    for i in files:
+        name = str(i.file).split("/")
+        i.file = name[len(name) - 1]
+
     users = list()
 
     Type = res.public
@@ -175,7 +179,9 @@ def uploadFile(request):
 
         uploadinst = Users.objects.get(email=request.session.get("email"))
 
-        file_create = Files.objects.create(id=last, uploaded_by=uploadinst, file=file, date=datetime.date.today(), time=datetime.datetime.now().strftime("%H:%M:%S"))
+        folderinst = Folders.objects.get(specialname=special)
+
+        file_create = Files.objects.create(id=last, uploaded_by=uploadinst, folder=folderinst.url, file=file, date=datetime.date.today(), time=datetime.datetime.now().strftime("%H:%M:%S"))
 
         #file_create.file = file
 
@@ -293,12 +299,6 @@ def search(request):
     folders = Folders.objects.all().filter(name__contains=query).filter(owner=ownerinst)
 
     files = Files.objects.all().filter(file__contains=query).filter(uploaded_by=ownerinst)
-
-    for i in folders:
-        print(i.name, i.owner.email)
-
-    for i in files:
-        print(i, i.date, i.time, i.uploaded_by.email)
 
     text = []
 
