@@ -257,12 +257,12 @@
                     {% for i in files %}
                     <tr>
                         <td>
-                            <a href="/assets/{{ i }}" target="_blank">{{ i }}</a>
+                            <a href="/assets/{{ root }}{{ i.folder }}/{{ i }}" target="_blank">{{ i }}</a>
                         </td>
                         <td>{{ i.date }}</td>
                         <td>{{ i.time }}</td>
                         <td>
-                            <a href="/assets/{{ i }}" download>{{ i }}</a>
+                            <a href="/assets/{{ root }}{{ i.folder }}/{{ i }}" download>{{ i }}</a>
                         </td>
                         <td>
                             <form action="{% url 'deletefile' %}" method="post">
@@ -584,6 +584,50 @@
         </div>
 
     </div>
+
+    <script>
+                document.getElementById("search-box").addEventListener("focus", () => {
+            document.getElementById("search-results").style.maxHeight = "150px";
+            document.getElementById("search-box").style.borderBottomLeftRadius = 0;
+            document.getElementById("search-box").style.borderBottomRightRadius = 0;
+        });
+
+
+        document.getElementById("search-box").addEventListener("blur", () => {
+            document.getElementById("search-results").style.maxHeight = 0;
+            setTimeout(() => {
+                document.getElementById("search-box").style.borderBottomLeftRadius = "10px";
+                document.getElementById("search-box").style.borderBottomRightRadius = "10px";
+            }, 350)
+        });
+
+        document.getElementById("search-box").addEventListener("input", () => {
+            let query = document.getElementById("search-box").value;
+            if (query == "") {
+                document.getElementById("search-results").innerHTML = "";
+            } else {
+                $.ajax({
+                    url: "{% url 'search' %}",
+                    type: "GET",
+                    contentType: "text/javascript",
+                    dataType: "text",
+                    data: {
+                        'query': query
+                    },
+                    success: (res) => {
+                        res = res.split(",");
+                        document.getElementById("search-results").innerHTML = "";
+                        for (let i = 0; i < res.length; i++) {
+                            document.getElementById("search-results").innerHTML += res[i];
+                        }
+                    },
+                    error: (err) => {
+                        console.log(err)
+                    }
+                })
+            }
+        })
+    </script>
 
     {% endif %}
 
